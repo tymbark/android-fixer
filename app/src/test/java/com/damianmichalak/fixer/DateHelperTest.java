@@ -10,27 +10,27 @@ public class DateHelperTest {
 
     @Test
     public void testDates_normalInstance() throws Exception {
-        assert_().that(DateHelper.nextDate("2011-04-04")).isEqualTo("2011-04-05");
+        assert_().that(DateHelper.previousDate("2011-04-04")).isEqualTo("2011-04-03");
     }
 
     @Test
     public void testDates_endOfMonth() throws Exception {
-        assert_().that(DateHelper.nextDate("2011-01-31")).isEqualTo("2011-02-01");
+        assert_().that(DateHelper.previousDate("2011-02-01")).isEqualTo("2011-01-31");
     }
 
     @Test
     public void testDates_endOfYear() throws Exception {
-        assert_().that(DateHelper.nextDate("2011-12-31")).isEqualTo("2012-01-01");
+        assert_().that(DateHelper.previousDate("2012-01-01")).isEqualTo("2011-12-31");
     }
 
     @Test
     public void testDates_leapYear() throws Exception {
-        assert_().that(DateHelper.nextDate("2012-02-28")).isEqualTo("2012-02-29");
+        assert_().that(DateHelper.previousDate("2012-02-29")).isEqualTo("2012-02-28");
     }
 
     @Test
     public void testDates_notLeapYear() throws Exception {
-        assert_().that(DateHelper.nextDate("2011-02-28")).isEqualTo("2011-03-01");
+        assert_().that(DateHelper.previousDate("2011-03-01")).isEqualTo("2011-02-28");
     }
 
     @Test

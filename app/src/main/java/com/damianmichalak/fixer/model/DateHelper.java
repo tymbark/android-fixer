@@ -18,7 +18,7 @@ public class DateHelper {
         return year + "-" + monthString + "-" + dayString;
     }
 
-    public static String nextDate(String previousDate) {
+    public static String previousDate(String previousDate) {
         final int day = Integer.parseInt(previousDate.substring(8, 10));
         final int month = Integer.parseInt(previousDate.substring(5, 7)) - 1;
         final int year = Integer.parseInt(previousDate.substring(0, 4));
@@ -28,7 +28,7 @@ public class DateHelper {
         instance.set(Calendar.MONTH, month);
         instance.set(Calendar.YEAR, year);
 
-        instance.add(Calendar.DAY_OF_YEAR, 1);
+        instance.add(Calendar.DAY_OF_YEAR, -1);
 
         return getDateFromMillis(instance.getTimeInMillis());
     }

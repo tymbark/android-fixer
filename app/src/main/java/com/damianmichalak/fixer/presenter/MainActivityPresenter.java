@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.Observer;
 import rx.functions.Func1;
 
 public class MainActivityPresenter {
@@ -20,6 +21,7 @@ public class MainActivityPresenter {
     private final Observable<List<BaseAdapterItem>> dataSuccess;
     @Nonnull
     private final Observable<Throwable> dataError;
+    private FixerDao fixerDao;
 
     @Inject
     public MainActivityPresenter(FixerDao fixerDao) {
@@ -43,11 +45,17 @@ public class MainActivityPresenter {
                 });
 
         dataError = fixerDao.getDataOrError().compose(ResponseOrError.<FixerResponse>onlyError());
+        this.fixerDao = fixerDao;
     }
 
     @Nonnull
     public Observable<List<BaseAdapterItem>> getDataSuccess() {
         return dataSuccess;
+    }
+
+    @Nonnull
+    public Observer<Object> loadMoreObserver() {
+        return fixerDao.getLoadMoreObserver();
     }
 
     @Nonnull
@@ -83,6 +91,10 @@ public class MainActivityPresenter {
         public Float getNumber() {
             return number;
         }
+    }
+
+    public class ProgressLoadingItem extends BaseAdapterItem {
+
     }
 
 }
