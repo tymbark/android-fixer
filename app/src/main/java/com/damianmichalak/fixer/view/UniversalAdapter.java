@@ -29,7 +29,7 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
     LayoutInflater inflater;
 
     @Inject
-    public UniversalAdapter() {
+    UniversalAdapter() {
     }
 
     @Override
@@ -82,7 +82,7 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
         abstract void bind(BaseAdapterItem item);
     }
 
-    private class DateViewHolder extends UniversalAdapter.BaseViewHolder {
+    class DateViewHolder extends UniversalAdapter.BaseViewHolder {
 
         @BindView(R.id.date_item_layout_text)
         TextView date;
@@ -101,7 +101,7 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
 
     }
 
-    private class RatingViewHolder extends UniversalAdapter.BaseViewHolder {
+    class RatingViewHolder extends UniversalAdapter.BaseViewHolder {
 
         @BindView(R.id.rating_item_layout_text)
         TextView rating;
