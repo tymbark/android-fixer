@@ -20,16 +20,18 @@ import rx.subjects.PublishSubject;
 public class FixerDao {
 
     @Nonnull
-    private final Observable<ResponseOrError<FixerResponse>> dataOrError;
-    @Nonnull
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
+    @Nonnull
+    private final Observable<List<FixerResponse>> dataSuccess;
+    @Nonnull
+    private final Observable<Throwable> dataError;
 
     @Inject
     FixerDao(@Nonnull final ApiService apiService,
              @Nonnull final @Named("UI") Scheduler uiScheduler,
              @Nonnull final @Named("IO") Scheduler ioScheduler) {
 
-        final Observable<String> nextDateObservable = loadMoreSubject
+        final Observable<String> nextDateObservable = loadMoreSubject //todo dont trigger this when error!!!
                 .throttleFirst(1, TimeUnit.SECONDS, uiScheduler)
                 .startWith(((Object) null))
                 .scan(DateHelper.getDateFromMillis(System.currentTimeMillis()), new Func2<String, Object, String>() {
@@ -39,7 +41,7 @@ public class FixerDao {
                     }
                 });
 
-        dataOrError = nextDateObservable
+        final Observable<ResponseOrError<FixerResponse>> dataOrError = nextDateObservable
                 .flatMap(new Func1<String, Observable<ResponseOrError<FixerResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<FixerResponse>> call(String date) {
@@ -48,9 +50,11 @@ public class FixerDao {
                                 .observeOn(uiScheduler)
                                 .subscribeOn(ioScheduler);
                     }
-                });
+                })
+                .replay(1)
+                .refCount();
 
-        dataOrError
+        dataSuccess = dataOrError
                 .compose(ResponseOrError.<FixerResponse>onlySuccess())
                 .scan(new ArrayList<FixerResponse>(), new Func2<List<FixerResponse>, FixerResponse, List<FixerResponse>>() {
                     @Override
@@ -62,6 +66,7 @@ public class FixerDao {
                     }
                 });
 
+        dataError = dataOrError.compose(ResponseOrError.<FixerResponse>onlyError());
 
     }
 
@@ -71,7 +76,12 @@ public class FixerDao {
     }
 
     @Nonnull
-    public Observable<ResponseOrError<FixerResponse>> getDataOrError() {
-        return dataOrError;
+    public Observable<List<FixerResponse>> getDataSuccess() {
+        return dataSuccess;
+    }
+
+    @Nonnull
+    public Observable<Throwable> getDataError() {
+        return dataError;
     }
 }

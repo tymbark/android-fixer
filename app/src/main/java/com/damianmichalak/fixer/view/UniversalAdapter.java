@@ -22,6 +22,7 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
 
     private static final int ITEM_RATING = 0;
     private static final int ITEM_DATE = 1;
+    private static final int ITEM_PROGRESS = 2;
 
     private List<BaseAdapterItem> items = new ArrayList<>();
 
@@ -39,6 +40,8 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
                 return new DateViewHolder(inflater.inflate(R.layout.date_item_layout, parent, false));
             case ITEM_RATING:
                 return new RatingViewHolder(inflater.inflate(R.layout.rating_item_layout, parent, false));
+            case ITEM_PROGRESS:
+                return new ProgressViewHolder(inflater.inflate(R.layout.progress_item_layout, parent, false));
             default:
                 throw new IllegalStateException("Cannot find view for : " + viewType);
         }
@@ -62,6 +65,8 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
             return ITEM_DATE;
         } else if (baseAdapterItem instanceof MainActivityPresenter.RatingAdapterItem) {
             return ITEM_RATING;
+        } else if (baseAdapterItem instanceof MainActivityPresenter.ProgressLoadingItem) {
+            return ITEM_PROGRESS;
         } else {
             throw new IllegalStateException("Unsupported adapter item: " + baseAdapterItem.getClass().getSimpleName());
         }
@@ -115,6 +120,19 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
         public void bind(BaseAdapterItem item) {
             final MainActivityPresenter.RatingAdapterItem adapterItem = (MainActivityPresenter.RatingAdapterItem) item;
             rating.setText(adapterItem.getName() + " " + adapterItem.getNumber());
+        }
+
+    }
+
+    private class ProgressViewHolder extends UniversalAdapter.BaseViewHolder {
+
+        ProgressViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        @Override
+        public void bind(BaseAdapterItem item) {
+            ((MainActivityPresenter.ProgressLoadingItem) item).getLoadMore().onNext(null);
         }
 
     }

@@ -4,15 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 
 import com.damianmichalak.fixer.R;
 import com.damianmichalak.fixer.dagger.ActivityScope;
 import com.damianmichalak.fixer.presenter.MainActivityPresenter;
-import com.damianmichalak.fixer.util.LoadMoreHelper;
-import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
-import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -20,7 +16,6 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dagger.Provides;
-import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 import rx.subscriptions.Subscriptions;
 
@@ -53,10 +48,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         subscription.add(Subscriptions.from(
-                presenter.getDataSuccess().subscribe(adapter),
-                RxRecyclerView.scrollEvents(recyclerView)
-                        .map(LoadMoreHelper.mapToNeedLoadMore(layoutManager, adapter))
-                        .subscribe(presenter.loadMoreObserver())
+                presenter.getSubscription(),
+                presenter.getDataSuccess().subscribe(adapter)
         ));
 
     }
