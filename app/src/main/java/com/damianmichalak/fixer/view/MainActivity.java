@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
         presenter.dataOrError().subscribe(new Action1<ResponseOrError<FixerResponse>>() {
             @Override
             public void call(ResponseOrError<FixerResponse> fixerResponseResponseOrError) {
-                Log.d("CHUJ", "" + fixerResponseResponseOrError.toString());
             }
         });
 
