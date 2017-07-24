@@ -23,15 +23,12 @@ public class MainActivityPresenter {
     @Nonnull
     private final Observable<Throwable> dataError;
     @Nonnull
-    private final FixerDao fixerDao;
-    @Nonnull
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
     @Nonnull
     private final Subscription subscription;
 
     @Inject
     MainActivityPresenter(@Nonnull FixerDao fixerDao) {
-        this.fixerDao = fixerDao;
 
         dataSuccess = fixerDao.getDataSuccess()
                 .map(new Func1<List<FixerResponse>, List<BaseAdapterItem>>() {

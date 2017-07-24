@@ -33,13 +33,13 @@ public class FixerDao {
 
         final Observable<String> nextDateObservable = loadMoreSubject //todo dont trigger this when error!!!
                 .throttleFirst(1, TimeUnit.SECONDS, uiScheduler)
-                .startWith(((Object) null))
                 .scan(DateHelper.getDateFromMillis(System.currentTimeMillis()), new Func2<String, Object, String>() {
                     @Override
                     public String call(String previousDate, Object o) {
                         return DateHelper.previousDate(previousDate);
                     }
-                });
+                })
+                .startWith(DateHelper.getDateFromMillis(System.currentTimeMillis()));
 
         final Observable<ResponseOrError<FixerResponse>> dataOrError = nextDateObservable
                 .flatMap(new Func1<String, Observable<ResponseOrError<FixerResponse>>>() {
