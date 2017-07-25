@@ -29,11 +29,12 @@ public class FixerDao {
     @Inject
     FixerDao(@Nonnull final ApiService apiService,
              @Nonnull final @Named("UI") Scheduler uiScheduler,
-             @Nonnull final @Named("IO") Scheduler ioScheduler) {
+             @Nonnull final @Named("IO") Scheduler ioScheduler,
+             @Nonnull final DateHelper dateHelper) {
 
         final Observable<String> nextDateObservable = loadMoreSubject //todo dont trigger this when error!!!
                 .throttleFirst(1, TimeUnit.SECONDS, uiScheduler)
-                .scan(DateHelper.getDateFromMillis(System.currentTimeMillis()), new Func2<String, Object, String>() {
+                .scan(dateHelper.today(), new Func2<String, Object, String>() {
                     @Override
                     public String call(String previousDate, Object o) {
                         return DateHelper.previousDate(previousDate);
@@ -63,7 +64,8 @@ public class FixerDao {
                         newItems.add(newResponse);
                         return newItems;
                     }
-                });
+                })
+                .skip(1);
 
         dataError = dataOrError.compose(ResponseOrError.<FixerResponse>onlyError());
 

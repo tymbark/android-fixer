@@ -2,7 +2,17 @@ package com.damianmichalak.fixer.model;
 
 import java.util.Calendar;
 
+import javax.inject.Inject;
+
 public class DateHelper {
+
+    @Inject
+    DateHelper() {
+    }
+
+    public String today() {
+        return getDateFromMillis(System.currentTimeMillis());
+    }
 
     public static String getDateFromMillis(long millis) {
         final Calendar instance = Calendar.getInstance();
