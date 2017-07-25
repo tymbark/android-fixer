@@ -7,7 +7,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,9 +98,7 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
             }
             itemPosition -= 1;
         } while (itemPosition >= 0);
-
-        Log.d("CHUJ", "for position " + itemPosition + " found header on position:" + headerPosition);
-
+        
         return headerPosition;
     }
 
@@ -112,7 +109,6 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
 
     @Override
     public void bindHeaderData(View header, int headerPosition) {
-        Log.d("CHUJ", "bindHeaderData " + headerPosition);
         final BaseAdapterItem item = items.get(headerPosition);
         ((TextView) header.findViewById(R.id.date_item_layout_text))
                 .setText(((MainActivityPresenter.DateAdapterItem) item).getDate());
