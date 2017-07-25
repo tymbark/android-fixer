@@ -43,7 +43,6 @@ public class FixerDao {
                         return status;
                     }
                 })
-                .throttleFirst(1, TimeUnit.SECONDS, uiScheduler)
                 .scan(dateHelper.today(), new Func2<String, Boolean, String>() {
                     @Override
                     public String call(String previousDate, Boolean previousStatus) {
@@ -85,9 +84,14 @@ public class FixerDao {
                         return newItems;
                     }
                 })
-                .skip(1);
+                .skip(1)
+                .replay(1)
+                .refCount();
 
         dataError = dataOrError.compose(ResponseOrError.<FixerResponse>onlyError());
+
+        dataSuccess
+               .subscribe();
 
     }
 
