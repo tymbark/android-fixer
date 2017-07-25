@@ -1,5 +1,6 @@
 package com.damianmichalak.fixer.view;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -99,6 +100,12 @@ public class MainActivity extends AppCompatActivity {
         @Nonnull
         LayoutInflater provideInflater() {
             return getLayoutInflater();
+        }
+
+        @Provides
+        @Nonnull
+        Activity provideActivity() {
+            return MainActivity.this;
         }
     }
 

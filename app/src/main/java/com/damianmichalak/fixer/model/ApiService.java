@@ -6,7 +6,7 @@ import rx.Observable;
 
 public interface ApiService {
 
-    @GET("/{date}")
+    @GET("/{date}?base=PLN")
     Observable<FixerResponse> getFixerResponse(@Path("date") String date);
 
 }

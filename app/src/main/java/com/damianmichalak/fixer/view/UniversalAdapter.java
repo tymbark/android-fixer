@@ -1,5 +1,11 @@
 package com.damianmichalak.fixer.view;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +15,7 @@ import android.widget.TextView;
 
 import com.damianmichalak.fixer.R;
 import com.damianmichalak.fixer.presenter.MainActivityPresenter;
+import com.damianmichalak.fixer.presenter.OpenDetailsActivityArguments;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +36,9 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
 
     @Inject
     LayoutInflater inflater;
+
+    @Inject
+    Activity activity;
 
     @Inject
     UniversalAdapter() {
@@ -148,8 +158,11 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
         @BindView(R.id.rating_item_layout_text_currency)
         TextView currency;
 
+        private final View itemView;
+
         RatingViewHolder(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             ButterKnife.bind(this, itemView);
         }
 
@@ -158,6 +171,24 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
             final MainActivityPresenter.RatingAdapterItem adapterItem = (MainActivityPresenter.RatingAdapterItem) item;
             currency.setText(adapterItem.getName());
             value.setText(String.valueOf(adapterItem.getNumber()));
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Intent intent = DetailsActivity.newIntent(activity, new OpenDetailsActivityArguments(adapterItem.getName(), String.valueOf(adapterItem.getNumber()), adapterItem.getDate()));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        final Pair<View, String> pair1 = Pair.<View, String>create(value, value.getTransitionName());
+                        final Pair<View, String> pair2 = Pair.<View, String>create(currency, currency.getTransitionName());
+
+                        //noinspection unchecked
+                        ActivityCompat.startActivity(activity, intent,
+                                ActivityOptionsCompat
+                                        .makeSceneTransitionAnimation(activity, pair1, pair2)
+                                        .toBundle());
+                    } else {
+                        activity.startActivity(intent);
+                    }
+                }
+            });
         }
 
     }

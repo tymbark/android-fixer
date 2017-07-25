@@ -4,4 +4,10 @@
 
     <string name="api_error">An error occurred</string>
     <string name="main_empty_error">This list is empty</string>
+
+    <string name="transition_rating_name">transition_rating_name</string>
+    <string name="transition_rating_value">transition_rating_value</string>
+
+    <string name="details_activity_title">Details</string>
+    <string name="details_activity_text">Date: %1$s</string>
 </resources>

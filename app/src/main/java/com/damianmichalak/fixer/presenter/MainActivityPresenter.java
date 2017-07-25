@@ -27,6 +27,8 @@ public class MainActivityPresenter {
     @Nonnull
     private final Observable<Throwable> dataErrorObservable;
     @Nonnull
+    private final PublishSubject<OpenDetailsActivityArguments> itemClickObservable = PublishSubject.create();
+    @Nonnull
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
     @Nonnull
     private final Subscription subscription;
@@ -46,7 +48,7 @@ public class MainActivityPresenter {
 
                             for (String key : fixerResponse.getRates().keySet()) {
                                 final Float value = fixerResponse.getRates().get(key);
-                                items.add(new RatingAdapterItem(key, value));
+                                items.add(new RatingAdapterItem(key, value, fixerResponse.getDate()));
                             }
                         }
 
@@ -82,6 +84,12 @@ public class MainActivityPresenter {
     }
 
     @Nonnull
+    public Observable<OpenDetailsActivityArguments> getItemClickObservable() {
+        return itemClickObservable;
+    }
+
+    @Nonnull
+
     public Observable<Boolean> getEmptyObservable() {
         return emptyObservable;
     }
@@ -125,11 +133,17 @@ public class MainActivityPresenter {
 
     public class RatingAdapterItem extends BaseAdapterItem {
         private final String name;
+        private final String date;
         private final Float number;
 
-        RatingAdapterItem(String name, Float number) {
+        RatingAdapterItem(String name, Float number, String date) {
+            this.date = date;
             this.name = name;
             this.number = number;
+        }
+
+        public String getDate() {
+            return date;
         }
 
         public String getName() {
