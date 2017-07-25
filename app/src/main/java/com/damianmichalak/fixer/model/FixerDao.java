@@ -12,8 +12,10 @@ import javax.inject.Singleton;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 @Singleton
@@ -32,12 +34,24 @@ public class FixerDao {
              @Nonnull final @Named("IO") Scheduler ioScheduler,
              @Nonnull final DateHelper dateHelper) {
 
-        final Observable<String> nextDateObservable = loadMoreSubject //todo dont trigger this when error!!!
-                .throttleFirst(1, TimeUnit.SECONDS, uiScheduler)
-                .scan(dateHelper.today(), new Func2<String, Object, String>() {
+        final BehaviorSubject<Boolean> lastRequestStatus = BehaviorSubject.create();
+
+        final Observable<String> nextDateObservable = loadMoreSubject
+                .withLatestFrom(lastRequestStatus, new Func2<Object, Boolean, Boolean>() {
                     @Override
-                    public String call(String previousDate, Object o) {
-                        return DateHelper.previousDate(previousDate);
+                    public Boolean call(Object o, Boolean status) {
+                        return status;
+                    }
+                })
+                .throttleFirst(1, TimeUnit.SECONDS, uiScheduler)
+                .scan(dateHelper.today(), new Func2<String, Boolean, String>() {
+                    @Override
+                    public String call(String previousDate, Boolean previousStatus) {
+                        if (previousStatus) {
+                            return DateHelper.previousDate(previousDate);
+                        } else {
+                            return previousDate;
+                        }
                     }
                 });
 
@@ -47,6 +61,12 @@ public class FixerDao {
                     public Observable<ResponseOrError<FixerResponse>> call(String date) {
                         return apiService.getFixerResponse(date)
                                 .compose(ResponseOrError.<FixerResponse>toResponseOrError())
+                                .doOnNext(new Action1<ResponseOrError<FixerResponse>>() {
+                                    @Override
+                                    public void call(ResponseOrError<FixerResponse> responseOrError) {
+                                        lastRequestStatus.onNext(responseOrError.isData());
+                                    }
+                                })
                                 .observeOn(uiScheduler)
                                 .subscribeOn(ioScheduler);
                     }

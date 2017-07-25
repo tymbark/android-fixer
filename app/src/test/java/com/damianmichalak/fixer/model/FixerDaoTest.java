@@ -206,7 +206,7 @@ public class FixerDaoTest {
     }
 
     @Test
-    public void testOneRequestFails_fourReqeustAreSuccess() throws Exception {
+    public void testWhenOneReqeustConstantlyFails_repeatUntilSuccess_andDontMoveToNextDate() throws Exception {
         final FixerDao fixerDao = new FixerDao(apiService, scheduler, scheduler, dateHelper);
 
         when(apiService.getFixerResponse("2000-02-08")).thenReturn(Observable.just(getFixerResponse()));
@@ -214,7 +214,6 @@ public class FixerDaoTest {
         final Observable<FixerResponse> error = Observable.error(new Throwable());
         when(apiService.getFixerResponse("2000-02-06")).thenReturn(error);
         when(apiService.getFixerResponse("2000-02-05")).thenReturn(Observable.just(getFixerResponse()));
-        when(apiService.getFixerResponse("2000-02-04")).thenReturn(Observable.just(getFixerResponse()));
 
         final TestSubscriber<List<FixerResponse>> successSubscriber = new TestSubscriber<>();
         final TestSubscriber<Throwable> errorSubscriber = new TestSubscriber<>();
@@ -231,7 +230,11 @@ public class FixerDaoTest {
         fixerDao.getLoadMoreObserver().onNext(null);
         scheduler.triggerActions();
 
-        assert_().that(successSubscriber.getOnNextEvents()).hasSize(4);
-        assert_().that(errorSubscriber.getOnNextEvents()).hasSize(1);
+        assert_().that(successSubscriber.getOnNextEvents()).hasSize(2);
+        assert_().that(errorSubscriber.getOnNextEvents()).hasSize(3);
+
+        verify(apiService, times(1)).getFixerResponse("2000-02-08");
+        verify(apiService, times(1)).getFixerResponse("2000-02-07");
+        verify(apiService, times(3)).getFixerResponse("2000-02-06");
     }
 }
