@@ -1,5 +1,6 @@
 package com.damianmichalak.fixer.view;
 
 
-public class BaseAdapterItem {
+abstract public class BaseAdapterItem {
+    abstract public boolean isHeader();
 }

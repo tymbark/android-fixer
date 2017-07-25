@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new HeaderDecoration(recyclerView, adapter));
         recyclerView.setAdapter(adapter);
 
         subscription.add(Subscriptions.from(

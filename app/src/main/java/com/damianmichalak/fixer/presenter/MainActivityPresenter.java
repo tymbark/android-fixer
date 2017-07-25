@@ -31,6 +31,12 @@ public class MainActivityPresenter {
     MainActivityPresenter(@Nonnull FixerDao fixerDao) {
 
         dataSuccess = fixerDao.getDataSuccess()
+                .filter(new Func1<List<FixerResponse>, Boolean>() {
+                    @Override
+                    public Boolean call(List<FixerResponse> fixerResponses) {
+                        return !fixerResponses.isEmpty();
+                    }
+                })
                 .map(new Func1<List<FixerResponse>, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(List<FixerResponse> fixerResponses) {
@@ -81,6 +87,11 @@ public class MainActivityPresenter {
         public String getDate() {
             return date;
         }
+
+        @Override
+        public boolean isHeader() {
+            return true;
+        }
     }
 
     public class RatingAdapterItem extends BaseAdapterItem {
@@ -99,6 +110,11 @@ public class MainActivityPresenter {
         public Float getNumber() {
             return number;
         }
+
+        @Override
+        public boolean isHeader() {
+            return false;
+        }
     }
 
     public class ProgressLoadingItem extends BaseAdapterItem {
@@ -111,6 +127,11 @@ public class MainActivityPresenter {
 
         public Observer<Object> getLoadMore() {
             return loadMore;
+        }
+
+        @Override
+        public boolean isHeader() {
+            return false;
         }
     }
 

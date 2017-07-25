@@ -1,6 +1,7 @@
 package com.damianmichalak.fixer.view;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.functions.Action1;
 
-public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.BaseViewHolder> implements Action1<List<BaseAdapterItem>> {
+public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.BaseViewHolder> implements Action1<List<BaseAdapterItem>>, HeaderDecoration.StickyHeaderInterface {
 
     private static final int ITEM_RATING = 0;
     private static final int ITEM_DATE = 1;
@@ -78,6 +79,40 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
         notifyDataSetChanged();
     }
 
+    @Override
+    public int getHeaderPositionForItem(int itemPosition) {
+        int headerPosition = 0;
+        do {
+            if (isHeader(itemPosition)) {
+                headerPosition = itemPosition;
+                break;
+            }
+            itemPosition -= 1;
+        } while (itemPosition >= 0);
+
+        Log.d("CHUJ", "for position " + itemPosition + " found header on position:" + headerPosition);
+
+        return headerPosition;
+    }
+
+    @Override
+    public int getHeaderLayout(int headerPosition) {
+        return R.layout.date_item_layout;
+    }
+
+    @Override
+    public void bindHeaderData(View header, int headerPosition) {
+        Log.d("CHUJ", "bindHeaderData " + headerPosition);
+        final BaseAdapterItem item = items.get(headerPosition);
+        ((TextView) header.findViewById(R.id.date_item_layout_text))
+                .setText(((MainActivityPresenter.DateAdapterItem) item).getDate());
+    }
+
+    @Override
+    public boolean isHeader(int itemPosition) {
+        return items.get(itemPosition).isHeader();
+    }
+
     abstract class BaseViewHolder extends RecyclerView.ViewHolder {
 
         BaseViewHolder(View itemView) {
@@ -108,8 +143,10 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
 
     class RatingViewHolder extends UniversalAdapter.BaseViewHolder {
 
-        @BindView(R.id.rating_item_layout_text)
-        TextView rating;
+        @BindView(R.id.rating_item_layout_text_value)
+        TextView value;
+        @BindView(R.id.rating_item_layout_text_currency)
+        TextView currency;
 
         RatingViewHolder(View itemView) {
             super(itemView);
@@ -119,7 +156,8 @@ public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.Base
         @Override
         public void bind(BaseAdapterItem item) {
             final MainActivityPresenter.RatingAdapterItem adapterItem = (MainActivityPresenter.RatingAdapterItem) item;
-            rating.setText(adapterItem.getName() + " " + adapterItem.getNumber());
+            currency.setText(adapterItem.getName());
+            value.setText(String.valueOf(adapterItem.getNumber()));
         }
 
     }
