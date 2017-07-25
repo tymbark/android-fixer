@@ -35,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setElevation(0);
+
         ButterKnife.bind(this);
 
         DaggerMainActivity_Component.builder()
@@ -45,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new HeaderDecoration(recyclerView, adapter));
+        recyclerView.addItemDecoration(new HeaderDecoration(adapter));
         recyclerView.setAdapter(adapter);
 
         subscription.add(Subscriptions.from(

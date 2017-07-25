@@ -3,36 +3,15 @@ package com.damianmichalak.fixer.view;
 import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 public class HeaderDecoration extends RecyclerView.ItemDecoration {
 
     private StickyHeaderInterface mListener;
-    private int mStickyHeaderHeight;
 
-    public HeaderDecoration(RecyclerView recyclerView, StickyHeaderInterface listener) {
+    HeaderDecoration(StickyHeaderInterface listener) {
         mListener = listener;
-
-        // On Sticky Header Click
-        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
-                if (motionEvent.getY() <= mStickyHeaderHeight) {
-                    // Handle the clicks on the header here ...
-                    return true;
-                }
-                return false;
-            }
-
-            public void onTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
-
-            }
-
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        });
     }
 
     @Override
@@ -73,18 +52,18 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
         return header;
     }
 
-    private void drawHeader(Canvas c, View header) {
-        c.save();
-        c.translate(0, 0);
-        header.draw(c);
-        c.restore();
+    private void drawHeader(Canvas canvas, View header) {
+        canvas.save();
+        canvas.translate(0, 0);
+        header.draw(canvas);
+        canvas.restore();
     }
 
-    private void moveHeader(Canvas c, View currentHeader, View nextHeader) {
-        c.save();
-        c.translate(0, nextHeader.getTop() - currentHeader.getHeight());
-        currentHeader.draw(c);
-        c.restore();
+    private void moveHeader(Canvas canvas, View currentHeader, View nextHeader) {
+        canvas.save();
+        canvas.translate(0, nextHeader.getTop() - currentHeader.getHeight());
+        currentHeader.draw(canvas);
+        canvas.restore();
     }
 
     private View getChildInContact(RecyclerView parent, int contactPoint) {
@@ -119,10 +98,10 @@ public class HeaderDecoration extends RecyclerView.ItemDecoration {
 
         view.measure(childWidthSpec, childHeightSpec);
 
-        view.layout(0, 0, view.getMeasuredWidth(), mStickyHeaderHeight = view.getMeasuredHeight());
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
     }
 
-    public interface StickyHeaderInterface {
+    interface StickyHeaderInterface {
 
         /**
          * This method gets called by {@link HeaderDecoration} to fetch the position of the header item in the adapter

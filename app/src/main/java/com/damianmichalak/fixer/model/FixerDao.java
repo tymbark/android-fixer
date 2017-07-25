@@ -38,8 +38,7 @@ public class FixerDao {
                     public String call(String previousDate, Object o) {
                         return DateHelper.previousDate(previousDate);
                     }
-                })
-                .startWith(DateHelper.getDateFromMillis(System.currentTimeMillis()));
+                });
 
         final Observable<ResponseOrError<FixerResponse>> dataOrError = nextDateObservable
                 .flatMap(new Func1<String, Observable<ResponseOrError<FixerResponse>>>() {
