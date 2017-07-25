@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Fixer</string>
+
+
+    <string name="api_error">An error occurred</string>
+    <string name="main_empty_error">This list is empty</string>
 </resources>

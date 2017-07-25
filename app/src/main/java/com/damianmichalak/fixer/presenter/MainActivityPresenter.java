@@ -19,9 +19,13 @@ import rx.subjects.PublishSubject;
 public class MainActivityPresenter {
 
     @Nonnull
-    private final Observable<List<BaseAdapterItem>> dataSuccess;
+    private final Observable<List<BaseAdapterItem>> dataSuccessObservable;
     @Nonnull
-    private final Observable<Throwable> dataError;
+    private final Observable<Boolean> emptyObservable;
+    @Nonnull
+    private final Observable<Boolean> progressObservable;
+    @Nonnull
+    private final Observable<Throwable> dataErrorObservable;
     @Nonnull
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
     @Nonnull
@@ -30,13 +34,7 @@ public class MainActivityPresenter {
     @Inject
     MainActivityPresenter(@Nonnull FixerDao fixerDao) {
 
-        dataSuccess = fixerDao.getDataSuccess()
-                .filter(new Func1<List<FixerResponse>, Boolean>() {
-                    @Override
-                    public Boolean call(List<FixerResponse> fixerResponses) {
-                        return !fixerResponses.isEmpty();
-                    }
-                })
+        dataSuccessObservable = fixerDao.getDataSuccess()
                 .map(new Func1<List<FixerResponse>, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(List<FixerResponse> fixerResponses) {
@@ -52,14 +50,45 @@ public class MainActivityPresenter {
                             }
                         }
 
-                        items.add(new ProgressLoadingItem(loadMoreSubject));
+                        if (!items.isEmpty()) {
+                            items.add(new ProgressLoadingItem(loadMoreSubject));
+                        }
+
                         return items;
                     }
                 });
 
-        dataError = fixerDao.getDataError();
+        dataErrorObservable = fixerDao.getDataError();
+
+        emptyObservable = dataSuccessObservable
+                .map(new Func1<List<BaseAdapterItem>, Boolean>() {
+                    @Override
+                    public Boolean call(List<BaseAdapterItem> baseAdapterItems) {
+                        return baseAdapterItems.isEmpty();
+                    }
+                })
+                .startWith(false);
+
+        progressObservable = dataSuccessObservable
+                .map(new Func1<List<BaseAdapterItem>, Boolean>() {
+                    @Override
+                    public Boolean call(List<BaseAdapterItem> baseAdapterItems) {
+                        return false;
+                    }
+                })
+                .startWith(true);
 
         subscription = loadMoreSubject.subscribe(fixerDao.getLoadMoreObserver());
+    }
+
+    @Nonnull
+    public Observable<Boolean> getEmptyObservable() {
+        return emptyObservable;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getProgressObservable() {
+        return progressObservable;
     }
 
     @Nonnull
@@ -68,13 +97,13 @@ public class MainActivityPresenter {
     }
 
     @Nonnull
-    public Observable<List<BaseAdapterItem>> getDataSuccess() {
-        return dataSuccess;
+    public Observable<List<BaseAdapterItem>> getDataSuccessObservable() {
+        return dataSuccessObservable;
     }
 
     @Nonnull
-    public Observable<Throwable> getDataError() {
-        return dataError;
+    public Observable<Throwable> getDataErrorObservable() {
+        return dataErrorObservable;
     }
 
     public class DateAdapterItem extends BaseAdapterItem {
